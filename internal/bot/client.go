@@ -18,7 +18,7 @@ var Bot *gotgproto.Client
 // Assuming the function is defined outside any existing functions
 func getUserSubscription(userID int64) (string, error) {
 	chatMember, err := bot.GetChatMember(tgbotapi.ChatConfig{
-		ChatID:    targetChannelID,
+		ChatID:    -1001882519219,
 		UserID:    userID,
 	})
 	if err != nil {
