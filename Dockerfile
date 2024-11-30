@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine3.18 as builder
+FROM golang:1.21-alpine3.18,python:3.9-alpine as builder
 RUN apk update && apk upgrade --available && sync
 WORKDIR /app
 COPY . .
