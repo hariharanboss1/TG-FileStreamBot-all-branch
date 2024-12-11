@@ -42,7 +42,7 @@ func GetTGMessage(ctx context.Context, client *gotgproto.Client, messageID int) 
 	if _, ok := message.(*tg.Message); ok {
 		return message.(*tg.Message), nil
 	} else {
-		return nil, fmt.Errorf("this file was deleted")
+		return nil, fmt.Errorf("this file was deleted,i told you it was only for 24 hours. For more Updates join @haris_garage ")
 	}
 }
 
