@@ -95,8 +95,8 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	}
 	if strings.Contains(file.MimeType, "video") || strings.Contains(file.MimeType, "audio") || strings.Contains(file.MimeType, "pdf") {
 		row.Buttons = append(row.Buttons, &tg.KeyboardButtonURL{
-			Text: "Stream",
-			URL:  link,
+			Text: "Channel",
+			URL:  "https://t.me/haris_garage",
 		})
 	}
 	markup := &tg.ReplyInlineMarkup{
