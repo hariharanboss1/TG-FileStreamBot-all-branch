@@ -26,6 +26,6 @@ func start(ctx *ext.Context, u *ext.Update) error {
 		ctx.Reply(u, "You are not allowed to use this bot.", nil)
 		return dispatcher.EndGroups
 	}
-	ctx.Reply(u, "Hi, send me any file to get a direct streamble link to that file.\n\nJoin my Update Channel @haris_garage for more..\n\nOnly For 24 Hours", nil)
+	ctx.Reply(u, "Hi, send me any file to get a direct streamble link to that file 🤓.\n\nJoin my Update Channel @haris_garage 🗿 for more..\n\nOnly For 24 Hours ⏳\n\nUSE <a href='https://play.google.com/store/apps/details?id=idm.internet.download.manager'>1DM BROWSER</a> FOR FASTER DOWNLOADS 🔥", nil)
 	return dispatcher.EndGroups
 }
