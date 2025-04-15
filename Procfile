@@ -1,1 +1,1 @@
-web: fsb run
+web: ./fsb run

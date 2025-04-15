@@ -14,7 +14,7 @@
     "logo": "https://telegra.ph/file/a8bb3f6b334ad1200ddb4.png",
     "env": {
         "API_ID": {
-            "description": "Get this value from https://my.telegram.org"
+            "description": "Get this from https://my.telegram.org"
         },
         "API_HASH": {
             "description": "Get this value from https://my.telegram.org"
