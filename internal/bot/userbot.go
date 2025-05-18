@@ -25,8 +25,8 @@ func StartUserBot(l *zap.Logger) {
 	}
 	log.Sugar().Infoln("Starting userbot")
 	client, err := gotgproto.NewClient(
-		int(config.ValueOf.ApiID),
-		config.ValueOf.ApiHash,
+		int(config.ValueOf.APIID),
+		config.ValueOf.APIHash,
 		gotgproto.ClientTypePhone(""),
 		&gotgproto.ClientOpts{
 			Session:          sessionMaker.PyrogramSession(config.ValueOf.UserSession),
