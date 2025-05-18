@@ -24,7 +24,7 @@ func StartClient(log *zap.Logger) (*gotgproto.Client, error) {
 	})
 	go func(ctx context.Context) {
 		client, err := gotgproto.NewClient(
-			config.ValueOf.APIID,
+			int(config.ValueOf.APIID),
 			config.ValueOf.APIHash,
 			gotgproto.ClientTypeBot(config.ValueOf.BotToken),
 			&gotgproto.ClientOpts{
