@@ -38,19 +38,20 @@ func (au *allowedUsers) Decode(value string) error {
 }
 
 type config struct {
-	ApiID          int32        `envconfig:"API_ID" required:"true"`
-	ApiHash        string       `envconfig:"API_HASH" required:"true"`
-	BotToken       string       `envconfig:"BOT_TOKEN" required:"true"`
-	LogChannelID   int64        `envconfig:"LOG_CHANNEL" required:"true"`
-	Dev            bool         `envconfig:"DEV" default:"false"`
-	Port           int          `envconfig:"PORT" default:"8080"`
-	Host           string       `envconfig:"HOST" default:""`
-	HashLength     int          `envconfig:"HASH_LENGTH" default:"6"`
-	UseSessionFile bool         `envconfig:"USE_SESSION_FILE" default:"true"`
-	UserSession    string       `envconfig:"USER_SESSION"`
-	UsePublicIP    bool         `envconfig:"USE_PUBLIC_IP" default:"false"`
-	AllowedUsers   allowedUsers `envconfig:"ALLOWED_USERS"`
-	MultiTokens    []string
+	ApiID            int32        `envconfig:"API_ID" required:"true"`
+	ApiHash          string       `envconfig:"API_HASH" required:"true"`
+	BotToken         string       `envconfig:"BOT_TOKEN" required:"true"`
+	LogChannelID     int64        `envconfig:"LOG_CHANNEL" required:"true"`
+	ForceSubChannelID int64        `envconfig:"FORCE_SUB_CHANNEL"`
+	Dev              bool         `envconfig:"DEV" default:"false"`
+	Port             int          `envconfig:"PORT" default:"8080"`
+	Host             string       `envconfig:"HOST" default:""`
+	HashLength       int          `envconfig:"HASH_LENGTH" default:"6"`
+	UseSessionFile   bool         `envconfig:"USE_SESSION_FILE" default:"true"`
+	UserSession      string       `envconfig:"USER_SESSION"`
+	UsePublicIP      bool         `envconfig:"USE_PUBLIC_IP" default:"false"`
+	AllowedUsers     allowedUsers `envconfig:"ALLOWED_USERS"`
+	MultiTokens      []string
 }
 
 var botTokenRegex = regexp.MustCompile(`MULTI\_TOKEN\d+=(.*)`)
@@ -76,6 +77,7 @@ func SetFlagsFromConfig(cmd *cobra.Command) {
 	cmd.Flags().String("api-hash", ValueOf.ApiHash, "Telegram API Hash")
 	cmd.Flags().String("bot-token", ValueOf.BotToken, "Telegram Bot Token")
 	cmd.Flags().Int64("log-channel", ValueOf.LogChannelID, "Telegram Log Channel ID")
+	cmd.Flags().Int64("force-sub-channel", ValueOf.ForceSubChannelID, "Force Subscribe Channel ID")
 	cmd.Flags().Bool("dev", ValueOf.Dev, "Enable development mode")
 	cmd.Flags().IntP("port", "p", ValueOf.Port, "Server port")
 	cmd.Flags().String("host", ValueOf.Host, "Server host that will be included in links")
@@ -102,6 +104,10 @@ func (c *config) loadConfigFromArgs(log *zap.Logger, cmd *cobra.Command) {
 	logChannelID, _ := cmd.Flags().GetString("log-channel")
 	if logChannelID != "" {
 		os.Setenv("LOG_CHANNEL", logChannelID)
+	}
+	forceSubChannelID, _ := cmd.Flags().GetString("force-sub-channel")
+	if forceSubChannelID != "" {
+		os.Setenv("FORCE_SUB_CHANNEL", forceSubChannelID)
 	}
 	dev, _ := cmd.Flags().GetBool("dev")
 	if dev {
