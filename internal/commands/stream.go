@@ -52,7 +52,7 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	}
 
 	// Check if force sub is enabled and user is subscribed
-	if config.ValueOf.ForceSubChannelID != 0 {
+	if config.ValueOf.ForceSubChannel != "" {
 		isSubscribed, err := utils.IsUserSubscribed(ctx, ctx.Raw, ctx.PeerStorage, chatId)
 		if err != nil {
 			ctx.Reply(u, "Error checking subscription status. Please try again later.", nil)
@@ -63,14 +63,14 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 				Buttons: []tg.KeyboardButtonClass{
 					&tg.KeyboardButtonURL{
 						Text: "Join Channel",
-						URL:  fmt.Sprintf("https://t.me/%d", config.ValueOf.ForceSubChannelID),
+						URL:  fmt.Sprintf("https://t.me/%s", config.ValueOf.ForceSubChannel),
 					},
 				},
 			}
 			markup := &tg.ReplyInlineMarkup{
 				Rows: []tg.KeyboardButtonRow{row},
 			}
-			ctx.Reply(u, "Please join our channel to use this bot.", &ext.ReplyOpts{
+			ctx.Reply(u, "Please join our channel to get stream links.", &ext.ReplyOpts{
 				Markup: markup,
 			})
 			return dispatcher.EndGroups
