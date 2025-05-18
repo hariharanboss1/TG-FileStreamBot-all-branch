@@ -38,19 +38,19 @@ func (au *allowedUsers) Decode(value string) error {
 }
 
 type config struct {
-	ApiID            int32        `envconfig:"API_ID" required:"true"`
-	ApiHash          string       `envconfig:"API_HASH" required:"true"`
-	BotToken         string       `envconfig:"BOT_TOKEN" required:"true"`
-	LogChannelID     int64        `envconfig:"LOG_CHANNEL" required:"true"`
-	ForceSubChannelID int64        `envconfig:"FORCE_SUB_CHANNEL"`
-	Dev              bool         `envconfig:"DEV" default:"false"`
-	Port             int          `envconfig:"PORT" default:"8080"`
-	Host             string       `envconfig:"HOST" default:""`
-	HashLength       int          `envconfig:"HASH_LENGTH" default:"6"`
-	UseSessionFile   bool         `envconfig:"USE_SESSION_FILE" default:"true"`
-	UserSession      string       `envconfig:"USER_SESSION"`
-	UsePublicIP      bool         `envconfig:"USE_PUBLIC_IP" default:"false"`
-	AllowedUsers     allowedUsers `envconfig:"ALLOWED_USERS"`
+	APIID            int64    `envconfig:"API_ID" required:"true"`
+	APIHash          string   `envconfig:"API_HASH" required:"true"`
+	BotToken         string   `envconfig:"BOT_TOKEN" required:"true"`
+	LogChannelID     int64    `envconfig:"LOG_CHANNEL" required:"true"`
+	Host             string   `envconfig:"HOST" required:"true"`
+	Port             int      `envconfig:"PORT" required:"true"`
+	AllowedUsers     []int64  `envconfig:"ALLOWED_USERS"`
+	ForceSubChannel  string   `envconfig:"FORCE_SUB_CHANNEL"`
+	Dev              bool     `envconfig:"DEV" default:"false"`
+	HashLength       int      `envconfig:"HASH_LENGTH" default:"6"`
+	UseSessionFile   bool     `envconfig:"USE_SESSION_FILE" default:"true"`
+	UserSession      string   `envconfig:"USER_SESSION"`
+	UsePublicIP      bool     `envconfig:"USE_PUBLIC_IP" default:"false"`
 	MultiTokens      []string
 }
 
@@ -72,54 +72,47 @@ func (c *config) loadFromEnvFile(log *zap.Logger) {
 	}
 }
 
-func SetFlagsFromConfig(cmd *cobra.Command) {
-	cmd.Flags().Int32("api-id", ValueOf.ApiID, "Telegram API ID")
-	cmd.Flags().String("api-hash", ValueOf.ApiHash, "Telegram API Hash")
-	cmd.Flags().String("bot-token", ValueOf.BotToken, "Telegram Bot Token")
-	cmd.Flags().Int64("log-channel", ValueOf.LogChannelID, "Telegram Log Channel ID")
-	cmd.Flags().Int64("force-sub-channel", ValueOf.ForceSubChannelID, "Force Subscribe Channel ID")
-	cmd.Flags().Bool("dev", ValueOf.Dev, "Enable development mode")
-	cmd.Flags().IntP("port", "p", ValueOf.Port, "Server port")
-	cmd.Flags().String("host", ValueOf.Host, "Server host that will be included in links")
-	cmd.Flags().Int("hash-length", ValueOf.HashLength, "Hash length in links")
-	cmd.Flags().Bool("use-session-file", ValueOf.UseSessionFile, "Use session files")
-	cmd.Flags().String("user-session", ValueOf.UserSession, "Pyrogram user session")
-	cmd.Flags().Bool("use-public-ip", ValueOf.UsePublicIP, "Use public IP instead of local IP")
+func (c *config) SetFlagsFromConfig(cmd *cobra.Command) {
+	cmd.Flags().Int64Var(&c.APIID, "api-id", 0, "Telegram API ID")
+	cmd.Flags().StringVar(&c.APIHash, "api-hash", "", "Telegram API Hash")
+	cmd.Flags().StringVar(&c.BotToken, "bot-token", "", "Telegram Bot Token")
+	cmd.Flags().Int64Var(&c.LogChannelID, "log-channel", 0, "Log Channel ID")
+	cmd.Flags().StringVar(&c.Host, "host", "", "Host URL")
+	cmd.Flags().IntVar(&c.Port, "port", 0, "Port")
+	cmd.Flags().StringVar(&c.ForceSubChannel, "force-sub-channel", "", "Force Subscription Channel Username")
+	cmd.Flags().Bool("dev", c.Dev, "Enable development mode")
+	cmd.Flags().Int("hash-length", c.HashLength, "Hash length in links")
+	cmd.Flags().Bool("use-session-file", c.UseSessionFile, "Use session files")
+	cmd.Flags().String("user-session", c.UserSession, "Pyrogram user session")
+	cmd.Flags().Bool("use-public-ip", c.UsePublicIP, "Use public IP instead of local IP")
 	cmd.Flags().String("multi-token-txt-file", "", "Multi token txt file (Not implemented)")
 }
 
 func (c *config) loadConfigFromArgs(log *zap.Logger, cmd *cobra.Command) {
-	apiID, _ := cmd.Flags().GetInt32("api-id")
-	if apiID != 0 {
-		os.Setenv("API_ID", strconv.Itoa(int(apiID)))
+	if c.APIID != 0 {
+		os.Setenv("API_ID", strconv.FormatInt(c.APIID, 10))
 	}
-	apiHash, _ := cmd.Flags().GetString("api-hash")
-	if apiHash != "" {
-		os.Setenv("API_HASH", apiHash)
+	if c.APIHash != "" {
+		os.Setenv("API_HASH", c.APIHash)
 	}
-	botToken, _ := cmd.Flags().GetString("bot-token")
-	if botToken != "" {
-		os.Setenv("BOT_TOKEN", botToken)
+	if c.BotToken != "" {
+		os.Setenv("BOT_TOKEN", c.BotToken)
 	}
-	logChannelID, _ := cmd.Flags().GetString("log-channel")
-	if logChannelID != "" {
-		os.Setenv("LOG_CHANNEL", logChannelID)
+	if c.LogChannelID != 0 {
+		os.Setenv("LOG_CHANNEL", strconv.FormatInt(c.LogChannelID, 10))
 	}
-	forceSubChannelID, _ := cmd.Flags().GetString("force-sub-channel")
-	if forceSubChannelID != "" {
-		os.Setenv("FORCE_SUB_CHANNEL", forceSubChannelID)
+	if c.Host != "" {
+		os.Setenv("HOST", c.Host)
+	}
+	if c.Port != 0 {
+		os.Setenv("PORT", strconv.Itoa(c.Port))
+	}
+	if c.ForceSubChannel != "" {
+		os.Setenv("FORCE_SUB_CHANNEL", c.ForceSubChannel)
 	}
 	dev, _ := cmd.Flags().GetBool("dev")
 	if dev {
 		os.Setenv("DEV", strconv.FormatBool(dev))
-	}
-	port, _ := cmd.Flags().GetInt("port")
-	if port != 0 {
-		os.Setenv("PORT", strconv.Itoa(port))
-	}
-	host, _ := cmd.Flags().GetString("host")
-	if host != "" {
-		os.Setenv("HOST", host)
 	}
 	hashLength, _ := cmd.Flags().GetInt("hash-length")
 	if hashLength != 0 {
