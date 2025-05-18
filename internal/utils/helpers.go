@@ -211,10 +211,10 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		return false, fmt.Errorf("channel %s not found", config.ValueOf.ForceSubChannel)
 	}
 
-	// Get channel participants
+	// Get channel participants using the correct filter
 	participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
 		Channel: targetChannel.AsInput(),
-		Filter:  &tg.ChannelParticipantsSearch{Q: ""},
+		Filter:  &tg.ChannelParticipantsRecent{},
 		Offset:  0,
 		Limit:   100,
 	})
