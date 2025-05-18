@@ -185,25 +185,18 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		return true, nil
 	}
 
-	// Get channel by username
-	channels, err := client.ChannelsGetChannels(ctx, []tg.InputChannelClass{
-		&tg.InputChannel{
-			ChannelID:  0,
-			AccessHash: 0,
-		},
-	})
+	// Get channel by username using ResolveUsername
+	resolved, err := client.ContactsResolveUsername(ctx, config.ValueOf.ForceSubChannel)
 	if err != nil {
 		return false, err
 	}
 
-	// Find the channel with matching username
+	// Find the channel in the resolved peers
 	var targetChannel *tg.Channel
-	for _, chat := range channels.GetChats() {
-		if channel, ok := chat.(*tg.Channel); ok {
-			if channel.Username == config.ValueOf.ForceSubChannel {
-				targetChannel = channel
-				break
-			}
+	for _, peer := range resolved.GetChats() {
+		if channel, ok := peer.(*tg.Channel); ok {
+			targetChannel = channel
+			break
 		}
 	}
 
@@ -211,7 +204,7 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		return false, fmt.Errorf("channel %s not found", config.ValueOf.ForceSubChannel)
 	}
 
-	// Get channel participants using the correct filter
+	// Get channel participants
 	participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
 		Channel: targetChannel.AsInput(),
 		Filter:  &tg.ChannelParticipantsRecent{},
