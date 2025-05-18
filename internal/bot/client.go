@@ -24,8 +24,8 @@ func StartClient(log *zap.Logger) (*gotgproto.Client, error) {
 	})
 	go func(ctx context.Context) {
 		client, err := gotgproto.NewClient(
-			int(config.ValueOf.ApiID),
-			config.ValueOf.ApiHash,
+			config.ValueOf.APIID,
+			config.ValueOf.APIHash,
 			gotgproto.ClientTypeBot(config.ValueOf.BotToken),
 			&gotgproto.ClientOpts{
 				Session: sessionMaker.SqlSession(
