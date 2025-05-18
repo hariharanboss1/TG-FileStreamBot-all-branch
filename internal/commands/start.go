@@ -8,7 +8,7 @@ import (
 	"github.com/celestix/gotgproto/dispatcher/handlers"
 	"github.com/celestix/gotgproto/ext"
 	"github.com/celestix/gotgproto/storage"
-	"github.com/celestix/gotgproto/tg"
+	"github.com/gotd/td/tg"
 	"fmt"
 )
 
