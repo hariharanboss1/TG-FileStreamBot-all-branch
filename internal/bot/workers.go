@@ -155,8 +155,8 @@ func startWorker(l *zap.Logger, botToken string, index int) (*gotgproto.Client, 
 		sessionType = sessionMaker.SimpleSession()
 	}
 	client, err := gotgproto.NewClient(
-		int(config.ValueOf.ApiID),
-		config.ValueOf.ApiHash,
+		int(config.ValueOf.APIID),
+		config.ValueOf.APIHash,
 		gotgproto.ClientTypeBot(botToken),
 		&gotgproto.ClientOpts{
 			Session:          sessionType,
