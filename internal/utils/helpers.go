@@ -181,17 +181,39 @@ func ForwardMessages(ctx *ext.Context, fromChatId, toChatId int64, messageID int
 }
 
 func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *storage.PeerStorage, userID int64) (bool, error) {
-	if config.ValueOf.ForceSubChannelID == 0 {
+	if config.ValueOf.ForceSubChannel == "" {
 		return true, nil
 	}
 
-	channel, err := GetLogChannelPeer(ctx, client, peerStorage)
+	// Get channel by username
+	channels, err := client.ChannelsGetChannels(ctx, []tg.InputChannelClass{
+		&tg.InputChannel{
+			ChannelID:  0,
+			AccessHash: 0,
+		},
+	})
 	if err != nil {
 		return false, err
 	}
 
+	// Find the channel with matching username
+	var targetChannel *tg.Channel
+	for _, chat := range channels.GetChats() {
+		if channel, ok := chat.(*tg.Channel); ok {
+			if channel.Username == config.ValueOf.ForceSubChannel {
+				targetChannel = channel
+				break
+			}
+		}
+	}
+
+	if targetChannel == nil {
+		return false, fmt.Errorf("channel %s not found", config.ValueOf.ForceSubChannel)
+	}
+
+	// Get channel participants
 	participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
-		Channel: channel,
+		Channel: targetChannel.AsInput(),
 		Filter:  &tg.ChannelParticipantsSearch{Q: ""},
 		Offset:  0,
 		Limit:   100,
