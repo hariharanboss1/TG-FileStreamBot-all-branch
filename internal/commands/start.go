@@ -31,7 +31,7 @@ func start(ctx *ext.Context, u *ext.Update) error {
 
 	// Check if force sub is enabled and user is subscribed
 	if config.ValueOf.ForceSubChannelID != 0 {
-		isSubscribed, err := utils.IsUserSubscribed(ctx, ctx.Client, ctx.PeerStorage, chatId)
+		isSubscribed, err := utils.IsUserSubscribed(ctx, ctx.Raw, ctx.PeerStorage, chatId)
 		if err != nil {
 			ctx.Reply(u, "Error checking subscription status. Please try again later.", nil)
 			return dispatcher.EndGroups
