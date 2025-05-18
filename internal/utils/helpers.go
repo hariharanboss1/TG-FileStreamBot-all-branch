@@ -180,12 +180,12 @@ func ForwardMessages(ctx *ext.Context, fromChatId, toChatId int64, messageID int
 	return update.(*tg.Updates), nil
 }
 
-func IsUserSubscribed(ctx context.Context, client *tg.Client, userID int64) (bool, error) {
+func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *storage.PeerStorage, userID int64) (bool, error) {
 	if config.ValueOf.ForceSubChannelID == 0 {
 		return true, nil
 	}
 
-	channel, err := GetLogChannelPeer(ctx, client, client.PeerStorage)
+	channel, err := GetLogChannelPeer(ctx, client, peerStorage)
 	if err != nil {
 		return false, err
 	}
@@ -210,4 +210,3 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, userID int64) (boo
 	}
 	return false, nil
 }
-
