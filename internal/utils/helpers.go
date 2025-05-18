@@ -180,17 +180,17 @@ func ForwardMessages(ctx *ext.Context, fromChatId, toChatId int64, messageID int
 	return update.(*tg.Updates), nil
 }
 
-func IsUserSubscribed(ctx context.Context, client *gotgproto.Client, userID int64) (bool, error) {
+func IsUserSubscribed(ctx context.Context, client *tg.Client, userID int64) (bool, error) {
 	if config.ValueOf.ForceSubChannelID == 0 {
 		return true, nil
 	}
 
-	channel, err := GetLogChannelPeer(ctx, client.API(), client.PeerStorage)
+	channel, err := GetLogChannelPeer(ctx, client, client.PeerStorage)
 	if err != nil {
 		return false, err
 	}
 
-	participants, err := client.API().ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
+	participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
 		Channel: channel,
 		Filter:  &tg.ChannelParticipantsSearch{Q: ""},
 		Offset:  0,
@@ -210,3 +210,4 @@ func IsUserSubscribed(ctx context.Context, client *gotgproto.Client, userID int6
 	}
 	return false, nil
 }
+
