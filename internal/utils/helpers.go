@@ -212,11 +212,26 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		},
 	})
 	if err != nil {
-		// If we get a PARTICIPANT_NOT_EXIST error, user is not a member
-		if err.Error() == "PARTICIPANT_NOT_EXIST" {
+		// Handle specific error cases
+		switch {
+		case err.Error() == "PARTICIPANT_NOT_EXIST":
 			return false, nil
+		case err.Error() == "CHANNEL_PRIVATE":
+			return false, nil
+		case err.Error() == "CHANNEL_INVALID":
+			return false, nil
+		case err.Error() == "USER_NOT_PARTICIPANT":
+			return false, nil
+		case err.Error() == "USER_CHANNEL_INVALID":
+			return false, nil
+		default:
+			// Log the error for debugging
+			Logger.Error("Error checking channel membership",
+				zap.Error(err),
+				zap.Int64("userID", userID),
+				zap.String("channel", config.ValueOf.ForceSubChannel))
+			return false, nil // Return false instead of error to prevent bot from showing error message
 		}
-		return false, err
 	}
 
 	// If we get here, user is a participant
