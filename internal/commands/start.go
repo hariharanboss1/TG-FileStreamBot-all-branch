@@ -10,6 +10,7 @@ import (
 	"github.com/celestix/gotgproto/storage"
 	"github.com/gotd/td/tg"
 	"fmt"
+	"go.uber.org/zap"
 )
 
 func (m *command) LoadStart(dispatcher dispatcher.Dispatcher) {
@@ -33,7 +34,26 @@ func start(ctx *ext.Context, u *ext.Update) error {
 	if config.ValueOf.ForceSubChannel != "" {
 		isSubscribed, err := utils.IsUserSubscribed(ctx, ctx.Raw, ctx.PeerStorage, chatId)
 		if err != nil {
-			ctx.Reply(u, "Error checking subscription status. Please try again later.", nil)
+			// Log the error but don't show it to the user
+			utils.Logger.Error("Error checking subscription status",
+				zap.Error(err),
+				zap.Int64("userID", chatId),
+				zap.String("channel", config.ValueOf.ForceSubChannel))
+			// Show join channel message instead of error
+			row := tg.KeyboardButtonRow{
+				Buttons: []tg.KeyboardButtonClass{
+					&tg.KeyboardButtonURL{
+						Text: "Join Channel",
+						URL:  fmt.Sprintf("https://t.me/%s", config.ValueOf.ForceSubChannel),
+					},
+				},
+			}
+			markup := &tg.ReplyInlineMarkup{
+				Rows: []tg.KeyboardButtonRow{row},
+			}
+			ctx.Reply(u, "Please join our channel to use this bot.", &ext.ReplyOpts{
+				Markup: markup,
+			})
 			return dispatcher.EndGroups
 		}
 		if !isSubscribed {
