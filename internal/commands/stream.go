@@ -135,10 +135,12 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 			},
 		},
 	}
-	if strings.Contains(file.MimeType, "video") || strings.Contains(file.MimeType, "audio") || strings.Contains(file.MimeType, "pdf") {
+	// Add Stream button only for video files
+	if strings.Contains(file.MimeType, "video") {
+		streamURL := fmt.Sprintf("https://stream.hariharantelegram.workers.dev/?video=%s", link)
 		row.Buttons = append(row.Buttons, &tg.KeyboardButtonURL{
-			Text: "Channel",
-			URL:  "https://t.me/haris_garage",
+			Text: "Stream",
+			URL:  streamURL,
 		})
 	}
 	markup := &tg.ReplyInlineMarkup{
@@ -162,3 +164,4 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	}
 	return dispatcher.EndGroups
 }
+
