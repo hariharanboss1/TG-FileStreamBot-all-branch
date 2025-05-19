@@ -204,55 +204,27 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		return false, fmt.Errorf("channel %s not found", config.ValueOf.ForceSubChannel)
 	}
 
-	// Get channel participants with pagination
-	offset := 0
-	limit := 1500 // Note: Telegram API typically caps this at 200 participants per request
-	for {
-		participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
-			Channel: targetChannel.AsInput(),
-			Filter:  &tg.ChannelParticipantsRecent{},
-			Offset:  offset,
-			Limit:   limit,
-		})
-		if err != nil {
-			return false, err
-		}
-
-		channelParticipants := participants.(*tg.ChannelsChannelParticipants)
-		
-		// Check all participant types
-		for _, participant := range channelParticipants.Participants {
-			switch p := participant.(type) {
-			case *tg.ChannelParticipant:
-				if p.UserID == userID {
-					return true, nil
-				}
-			case *tg.ChannelParticipantAdmin:
-				if p.UserID == userID {
-					return true, nil
-				}
-			case *tg.ChannelParticipantCreator:
-				if p.UserID == userID {
-					return true, nil
-				}
-			case *tg.ChannelParticipantBanned:
-				if p.UserID == userID {
-					return true, nil
-				}
-			case *tg.ChannelParticipantLeft:
-				if p.UserID == userID {
-					return true, nil
-				}
-			}
-		}
-
-		// If we got less participants than the limit, we've reached the end
-		if len(channelParticipants.Participants) < limit {
-			break
-		}
-
-		offset += limit
+	// Get full channel info including participant count
+	fullChannel, err := client.ChannelsGetFullChannel(ctx, targetChannel.AsInput())
+	if err != nil {
+		return false, err
 	}
 
-	return false, nil
+	// Check if user is a participant using ChannelsGetParticipant
+	participant, err := client.ChannelsGetParticipant(ctx, &tg.ChannelsGetParticipantRequest{
+		Channel: targetChannel.AsInput(),
+		Participant: &tg.InputPeerUser{
+			UserID: userID,
+		},
+	})
+	if err != nil {
+		// If we get a PARTICIPANT_NOT_EXIST error, user is not a member
+		if err.Error() == "PARTICIPANT_NOT_EXIST" {
+			return false, nil
+		}
+		return false, err
+	}
+
+	// If we get here, user is a participant
+	return true, nil
 }
