@@ -14,8 +14,7 @@ import (
 	"github.com/celestix/gotgproto/types"
 	"github.com/gotd/td/telegram/message/styling"
 	"github.com/gotd/td/tg"
-	"github.com/sirupsen/logrus"
-	"github.com/sirupsen/logrus/zap"
+	"go.uber.org/zap"
 )
 
 func (m *command) LoadStream(dispatcher dispatcher.Dispatcher) {
