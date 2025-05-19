@@ -204,14 +204,8 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		return false, fmt.Errorf("channel %s not found", config.ValueOf.ForceSubChannel)
 	}
 
-	// Get full channel info including participant count
-	fullChannel, err := client.ChannelsGetFullChannel(ctx, targetChannel.AsInput())
-	if err != nil {
-		return false, err
-	}
-
 	// Check if user is a participant using ChannelsGetParticipant
-	participant, err := client.ChannelsGetParticipant(ctx, &tg.ChannelsGetParticipantRequest{
+	_, err = client.ChannelsGetParticipant(ctx, &tg.ChannelsGetParticipantRequest{
 		Channel: targetChannel.AsInput(),
 		Participant: &tg.InputPeerUser{
 			UserID: userID,
