@@ -204,24 +204,55 @@ func IsUserSubscribed(ctx context.Context, client *tg.Client, peerStorage *stora
 		return false, fmt.Errorf("channel %s not found", config.ValueOf.ForceSubChannel)
 	}
 
-	// Get channel participants
-	participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
-		Channel: targetChannel.AsInput(),
-		Filter:  &tg.ChannelParticipantsRecent{},
-		Offset:  0,
-		Limit:   100,
-	})
-	if err != nil {
-		return false, err
-	}
+	// Get channel participants with pagination
+	offset := 0
+	limit := 1500 // Note: Telegram API typically caps this at 200 participants per request
+	for {
+		participants, err := client.ChannelsGetParticipants(ctx, &tg.ChannelsGetParticipantsRequest{
+			Channel: targetChannel.AsInput(),
+			Filter:  &tg.ChannelParticipantsRecent{},
+			Offset:  offset,
+			Limit:   limit,
+		})
+		if err != nil {
+			return false, err
+		}
 
-	channelParticipants := participants.(*tg.ChannelsChannelParticipants)
-	for _, participant := range channelParticipants.Participants {
-		if user, ok := participant.(*tg.ChannelParticipant); ok {
-			if user.UserID == userID {
-				return true, nil
+		channelParticipants := participants.(*tg.ChannelsChannelParticipants)
+		
+		// Check all participant types
+		for _, participant := range channelParticipants.Participants {
+			switch p := participant.(type) {
+			case *tg.ChannelParticipant:
+				if p.UserID == userID {
+					return true, nil
+				}
+			case *tg.ChannelParticipantAdmin:
+				if p.UserID == userID {
+					return true, nil
+				}
+			case *tg.ChannelParticipantCreator:
+				if p.UserID == userID {
+					return true, nil
+				}
+			case *tg.ChannelParticipantBanned:
+				if p.UserID == userID {
+					return true, nil
+				}
+			case *tg.ChannelParticipantLeft:
+				if p.UserID == userID {
+					return true, nil
+				}
 			}
 		}
+
+		// If we got less participants than the limit, we've reached the end
+		if len(channelParticipants.Participants) < limit {
+			break
+		}
+
+		offset += limit
 	}
+
 	return false, nil
 }
