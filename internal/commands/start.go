@@ -30,51 +30,6 @@ func start(ctx *ext.Context, u *ext.Update) error {
 		return dispatcher.EndGroups
 	}
 
-	// Check if force sub is enabled and user is subscribed
-	if config.ValueOf.ForceSubChannel != "" {
-		isSubscribed, err := utils.IsUserSubscribed(ctx, ctx.Raw, ctx.PeerStorage, chatId)
-		if err != nil {
-			// Log the error but don't show it to the user
-			utils.Logger.Error("Error checking subscription status",
-				zap.Error(err),
-				zap.Int64("userID", chatId),
-				zap.String("channel", config.ValueOf.ForceSubChannel))
-			// Show join channel message instead of error
-			row := tg.KeyboardButtonRow{
-				Buttons: []tg.KeyboardButtonClass{
-					&tg.KeyboardButtonURL{
-						Text: "Join Channel",
-						URL:  fmt.Sprintf("https://t.me/%s", config.ValueOf.ForceSubChannel),
-					},
-				},
-			}
-			markup := &tg.ReplyInlineMarkup{
-				Rows: []tg.KeyboardButtonRow{row},
-			}
-			ctx.Reply(u, "Please join our channel to use this bot.", &ext.ReplyOpts{
-				Markup: markup,
-			})
-			return dispatcher.EndGroups
-		}
-		if !isSubscribed {
-			row := tg.KeyboardButtonRow{
-				Buttons: []tg.KeyboardButtonClass{
-					&tg.KeyboardButtonURL{
-						Text: "Join Channel",
-						URL:  fmt.Sprintf("https://t.me/%s", config.ValueOf.ForceSubChannel),
-					},
-				},
-			}
-			markup := &tg.ReplyInlineMarkup{
-				Rows: []tg.KeyboardButtonRow{row},
-			}
-			ctx.Reply(u, "Please join our channel to use this bot.", &ext.ReplyOpts{
-				Markup: markup,
-			})
-			return dispatcher.EndGroups
-		}
-	}
-
 	ctx.Reply(u, "Need a direct streamable link to a file? Send it my way! 🤓\n\nJoin my Update Channel @haris_garage 🗿 for more updates.\n\nLink validity: 24 hours ⏳\n\nPro Tip: Use 1DM Browser for lightning-fast downloads! 🔥", nil)
 	return dispatcher.EndGroups
 }
