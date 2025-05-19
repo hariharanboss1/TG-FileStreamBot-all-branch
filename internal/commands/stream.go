@@ -126,7 +126,10 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	)
 	hash := utils.GetShortHash(fullHash)
 	link := fmt.Sprintf("%s/stream/%d?hash=%s", config.ValueOf.Host, messageID, hash)
-	text := []styling.StyledTextOption{styling.Code(link)}
+	
+	// Create formatted message
+	message := fmt.Sprintf("📄 File Name: %s\n\n📥 Download Link: %s\n\n⏳ Link validity is 24 hours", file.FileName, link)
+	
 	row := tg.KeyboardButtonRow{
 		Buttons: []tg.KeyboardButtonClass{
 			&tg.KeyboardButtonURL{
@@ -147,12 +150,12 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 		Rows: []tg.KeyboardButtonRow{row},
 	}
 	if strings.Contains(link, "http://localhost") {
-		_, err = ctx.Reply(u, text, &ext.ReplyOpts{
+		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
 		})
 	} else {
-		_, err = ctx.Reply(u, text, &ext.ReplyOpts{
+		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			Markup:           markup,
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
@@ -164,4 +167,3 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	}
 	return dispatcher.EndGroups
 }
-
