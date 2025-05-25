@@ -126,8 +126,8 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	hash := utils.GetShortHash(fullHash)
 	link := fmt.Sprintf("%s/stream/%d?hash=%s", config.ValueOf.Host, messageID, hash)
 	
-	// Create formatted message with copyable link
-	message := fmt.Sprintf("📄 File Name: %s\n\n📥 Download Link:\n`%s`", file.FileName, link)
+	// Create formatted message with clickable hyperlink
+	message := fmt.Sprintf("📄 File Name: %s\n\n📥 Download Link:\n<a href=\"%s\">%s</a>⏳ Link validity is 24 hours", file.FileName, link, link)
 	
 	row := tg.KeyboardButtonRow{
 		Buttons: []tg.KeyboardButtonClass{
@@ -152,12 +152,14 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
+			ParseMode:        "HTML",
 		})
 	} else {
 		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			Markup:           markup,
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
+			ParseMode:        "HTML",
 		})
 	}
 	if err != nil {
