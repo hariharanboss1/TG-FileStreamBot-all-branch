@@ -13,7 +13,6 @@ import (
 	"github.com/celestix/gotgproto/storage"
 	"github.com/celestix/gotgproto/types"
 	"github.com/gotd/td/tg"
-	"github.com/gotd/td/telegram/message/styling"
 	"go.uber.org/zap"
 )
 
