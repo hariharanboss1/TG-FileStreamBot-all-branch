@@ -13,6 +13,7 @@ import (
 	"github.com/celestix/gotgproto/storage"
 	"github.com/celestix/gotgproto/types"
 	"github.com/gotd/td/tg"
+	"github.com/gotd/td/telegram/message/styling"
 	"go.uber.org/zap"
 )
 
@@ -127,7 +128,7 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	link := fmt.Sprintf("%s/stream/%d?hash=%s", config.ValueOf.Host, messageID, hash)
 	
 	// Create formatted message with clickable hyperlink
-	message := fmt.Sprintf("📄 File Name: %s\n\n📥 Download Link:\n<a href=\"%s\">%s</a>\n\n⏳ Link validity is 24 hours", file.FileName, link, link)
+	message := fmt.Sprintf("📄 File Name: %s\n\n📥 Download Link:\n%s\n\n⏳ Link validity is 24 hours", file.FileName, link)
 	
 	row := tg.KeyboardButtonRow{
 		Buttons: []tg.KeyboardButtonClass{
@@ -152,14 +153,26 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
-			ParseMode:        "HTML",
+			Entities: []tg.MessageEntityClass{
+				&tg.MessageEntityTextURL{
+					Offset: int32(strings.Index(message, link)),
+					Length: int32(len(link)),
+					URL:    link,
+				},
+			},
 		})
 	} else {
 		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			Markup:           markup,
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
-			ParseMode:        "HTML",
+			Entities: []tg.MessageEntityClass{
+				&tg.MessageEntityTextURL{
+					Offset: int32(strings.Index(message, link)),
+					Length: int32(len(link)),
+					URL:    link,
+				},
+			},
 		})
 	}
 	if err != nil {
