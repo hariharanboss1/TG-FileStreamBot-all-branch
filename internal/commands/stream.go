@@ -153,26 +153,12 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
-			Entities: []tg.MessageEntityClass{
-				&tg.MessageEntityTextURL{
-					Offset: int32(strings.Index(message, link)),
-					Length: int32(len(link)),
-					URL:    link,
-				},
-			},
 		})
 	} else {
 		_, err = ctx.Reply(u, message, &ext.ReplyOpts{
 			Markup:           markup,
 			NoWebpage:        false,
 			ReplyToMessageId: u.EffectiveMessage.ID,
-			Entities: []tg.MessageEntityClass{
-				&tg.MessageEntityTextURL{
-					Offset: int32(strings.Index(message, link)),
-					Length: int32(len(link)),
-					URL:    link,
-				},
-			},
 		})
 	}
 	if err != nil {
